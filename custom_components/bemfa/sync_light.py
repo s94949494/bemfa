@@ -45,7 +45,11 @@ class Light(ControllableSync):
             lambda state, attributes: round(attributes[ATTR_BRIGHTNESS] / 2.55)
             if has_key(attributes, ATTR_BRIGHTNESS)
             else "",
-            lambda state, attributes: 1000000 // attributes[ATTR_COLOR_TEMP_KELVIN]
+            lambda state, attributes: (
+                (attributes[ATTR_COLOR_TEMP_KELVIN] - attributes[ATTR_MIN_COLOR_TEMP_KELVIN])
+                * 100
+                // (attributes[ATTR_MAX_COLOR_TEMP_KELVIN] - attributes[ATTR_MIN_COLOR_TEMP_KELVIN])
+            )
             if has_key(attributes, ATTR_COLOR_TEMP_KELVIN)
             else attributes[ATTR_RGB_COLOR][0] * 256 * 256
             + attributes[ATTR_RGB_COLOR][1] * 256
@@ -76,12 +80,16 @@ class Light(ControllableSync):
                     {
                         ATTR_BRIGHTNESS_PCT: msg[1],
                         ATTR_COLOR_TEMP_KELVIN: min(
+                            max(
                             attributes[ATTR_MIN_COLOR_TEMP_KELVIN]
                             + (attributes[ATTR_MAX_COLOR_TEMP_KELVIN]
                                - attributes[ATTR_MIN_COLOR_TEMP_KELVIN])
                             * max(0, min(msg[2], 100))
-                            // 100
+                            // 100,
+                            attributes[ATTR_MIN_COLOR_TEMP_KELVIN],
                         ),
+                            attributes[ATTR_MAX_COLOR_TEMP_KELVIN],
+                      ),
                     }
                     if len(msg) > 2
                     and has_key(attributes, ATTR_SUPPORTED_COLOR_MODES)
