@@ -91,9 +91,7 @@ class Light(ControllableSync):
                             attributes[ATTR_MAX_COLOR_TEMP_KELVIN],
                       ),
                     }
-                    if len(msg) > 2
-                    and has_key(attributes, ATTR_SUPPORTED_COLOR_MODES)
-                    and ColorMode.COLOR_TEMP in attributes[ATTR_SUPPORTED_COLOR_MODES]
+                    if msg[2] <= 100
                     else {
                         ATTR_BRIGHTNESS_PCT: msg[1],
                         ATTR_RGB_COLOR: [
